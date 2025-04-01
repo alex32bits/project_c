@@ -5,7 +5,7 @@ int v[11];
 int n = 10;
 
 int ct=0;
-
+//contor
 void afisare(int pos)
 {
     for (int i = 0; i < n; i++)
