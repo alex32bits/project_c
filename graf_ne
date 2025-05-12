@@ -1,0 +1,208 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <stdlib.h>
+#define MAX 100
+int n;
+int matr[MAX][MAX];
+int vizitat[MAX];
+
+void clear()
+{
+	for (int i = 1; i <= n; i++)
+		vizitat[i] = 0;
+}
+
+void DFS(int nod)
+{
+	vizitat[nod] = 1;
+	printf("%d ", nod);
+	for (int i = 1; i <= n; i++)
+	{
+		if (matr[nod][i] == 1 && vizitat[i] == 0)
+		{
+			DFS(i);
+
+		}
+	}
+}
+
+
+void BFS(int nod)
+{
+	vizitat[nod] = 1;
+	int coada[MAX];
+	int st = 0;
+	int dr = 0;
+	coada[dr++] = nod;
+		
+	while (st < dr)
+	{
+		int aux = coada[st++];
+		printf("%d ", aux);
+		for (int i = 1; i <= n; i++)
+		{
+			if (matr[aux][i] == 1 && vizitat[i] == 0)
+			{
+				coada[dr++] = i;
+				vizitat[i] = 1;
+			}
+		}
+	}
+
+}
+
+void drum(int start, int stop)
+{
+	vizitat[start] = 1;
+	int coada[MAX];
+	int st = 0;
+	int dr = 0;
+	coada[dr++] = start;
+
+	int pred[MAX];
+	for (int i = 1; i <= n; i++)
+		pred[i] = -1;
+
+	while (st < dr)
+	{
+		int aux = coada[st++];
+		
+		if (aux == stop)
+			break;
+		for (int i = 1; i <= n; i++)
+		{
+			if (matr[aux][i] == 1 && vizitat[i] == 0)
+			{
+				coada[dr++] = i;
+				vizitat[i] = 1;
+				pred[i] = aux;
+			}
+		}
+	}
+
+	if (vizitat[stop] == 0)
+	{
+		printf("nu exista drum intre %d si %d ", start, stop);
+		return;
+	}
+
+	int a = stop;
+	printf("%d ", a);
+	while (pred[a] != -1)
+	{
+		printf("%d ", pred[a]);
+		a = pred[a];
+	}
+	printf("\n");
+
+}
+
+void conexe()
+{
+	clear();
+	for (int i = 1; i <= n; i++)
+	{
+		if (vizitat[i] == 0)
+		{
+			printf("componenete conexe: ");
+			DFS(i);
+			printf("\n");
+		}
+	}
+}
+
+void grad()
+{
+	for (int i = 1; i <= n; i++)
+	{
+		int grad = 0;
+		for (int j = 1; j <= n; j++)
+		{
+			grad = grad + matr[i][j];
+		}
+		printf("gradul lui %d este %d.\n", i, grad);
+	}
+}
+
+int ciclu(int nod, int parinte)
+{
+	vizitat[nod] = 1;
+
+	for (int i = 1; i <= n; i++)
+	{
+		if (matr[nod][i] == 1)
+		{
+			if (vizitat[i] == 0)
+			{
+				if (ciclu(i, nod))
+					return 1;
+			}
+			else if (i != parinte)
+			{
+				return 1;
+			}
+		}
+	}
+	return 0;
+}
+
+int main()
+{
+	FILE* f = fopen("date.txt", "r");
+	if (f == NULL)
+	{
+		perror("NULL");
+		exit(-1);
+	}
+	fscanf(f, "%d", &n);
+
+	for (int i = 1; i <= n; i++)
+	{
+		for (int j = 1; j <= n; j++)
+		{
+			matr[i][j] = 0;
+		}
+	}
+	int a, b;
+	while (fscanf(f, "%d  %d", &a, &b) > 0)
+	{
+		matr[a][b] = 1;
+		matr[b][a] = 1;
+	}
+
+	for (int i = 1; i <= n; i++)
+	{
+		for (int j = 1; j <= n; j++)
+		{
+			printf("%d ", matr[i][j]);
+		}
+		printf("\n");
+	}
+
+
+	clear();
+	printf("\n\nDFS: ");
+	DFS(1);
+
+	clear();
+	printf("\n\nBFS: ");
+	BFS(1);
+
+	clear();
+	printf("\n\ndrum inte 1 si 5:  ");
+	drum(1, 5);
+
+	clear();
+	printf("\n\ndrum inte 1 si 5:  ");
+	drum(5, 7);
+
+	printf("\n");
+	conexe();
+
+	printf("\n");
+	grad();
+
+	clear();
+	printf("este un ciclu %d", ciclu(1, -1));
+	return 0;
+}
